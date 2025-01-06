@@ -45,7 +45,6 @@ public class Main {
     int cont;
     byte[] data = new byte[2];
     databaseFile.skip(100+3);
-    databaseFile.reset();
     databaseFile.read(data);
     cont = (int) ByteBuffer.wrap(data).getShort();
     return cont;
