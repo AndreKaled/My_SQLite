@@ -1,7 +1,8 @@
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
   public static void main(String[] args){
@@ -16,11 +17,12 @@ public class Main {
     switch (command) {
       case ".dbinfo" -> {
         try {
-          FileInputStream databaseFile = new FileInputStream(new File(databaseFilePath));
+          byte[] bytes = Files.readAllBytes(Path.of(databaseFilePath));
+          ByteBuffer buf = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
           //parte 1 do desafio
-          System.out.println("database page size: " +getPageSize(databaseFile));
+          System.out.println("database page size: " +getPageSize(buf));
           //parte 2 do desafio
-          System.out.println("number of tables: " +countTable(databaseFile));
+          System.out.println("number of tables: " +countTable(buf));
           
         } catch (IOException e) {
           System.out.println("Error reading file: " + e.getMessage());
@@ -30,23 +32,14 @@ public class Main {
     }
   }
 
-  public static int getPageSize(FileInputStream databaseInput) throws IOException{
-    FileInputStream databaseFile = databaseInput;
-    databaseFile.skip(16); // Pula os primeiros 16 bytes do cabecalho
-    byte[] pageSizeBytes = new byte[2]; // armazena o tamanho em bytes
-    databaseFile.read(pageSizeBytes);
-    short pageSizeSigned = ByteBuffer.wrap(pageSizeBytes).getShort();
-    int pageSize = Short.toUnsignedInt(pageSizeSigned);
+  public static int getPageSize(ByteBuffer buf) throws IOException{
+    buf.position(16);//pula o header
+    int pageSize = buf.getShort(); //pega 2 bytes (referentes ao tamanho)
     return pageSize;
   }
 
-  public static int countTable(FileInputStream databaseInput) throws IOException{
-    FileInputStream databaseFile = databaseInput;
-    int cont;
-    byte[] data = new byte[2];
-    databaseFile.skip(100+3);
-    databaseFile.read(data);
-    cont = (int) ByteBuffer.wrap(data).getShort();
-    return cont;
+  public static int countTable(ByteBuffer buf) throws IOException {
+    buf.position(100+3);
+    return Short.toUnsignedInt(buf.getShort());
   }
 }
