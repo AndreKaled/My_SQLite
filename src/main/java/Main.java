@@ -30,7 +30,8 @@ public class Main {
     }
   }
 
-  public static int getPageSize(FileInputStream databaseFile) throws IOException{
+  public static int getPageSize(FileInputStream databaseInput) throws IOException{
+    FileInputStream databaseFile = databaseInput;
     databaseFile.skip(16); // Pula os primeiros 16 bytes do cabecalho
     byte[] pageSizeBytes = new byte[2]; // armazena o tamanho em bytes
     databaseFile.read(pageSizeBytes);
@@ -39,11 +40,13 @@ public class Main {
     return pageSize;
   }
 
-  public static int countTable(FileInputStream databasefile) throws IOException{
+  public static int countTable(FileInputStream databaseInput) throws IOException{
+    FileInputStream databaseFile = databaseInput;
     int cont;
     byte[] data = new byte[2];
-    databasefile.skip(100+3);
-    databasefile.read(data);
+    databaseFile.skip(100+3);
+    databaseFile.reset();
+    databaseFile.read(data);
     cont = (int) ByteBuffer.wrap(data).getShort();
     return cont;
   }
