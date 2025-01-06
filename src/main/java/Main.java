@@ -17,19 +17,34 @@ public class Main {
       case ".dbinfo" -> {
         try {
           FileInputStream databaseFile = new FileInputStream(new File(databaseFilePath));
+          //parte 1 do desafio
+          System.out.println("database page size: " +getPageSize(databaseFile));
+          //parte 2 do desafio
+          System.out.println("number of tables: " +countTable(databaseFile));
           
-          databaseFile.skip(16); // Skip the first 16 bytes of the header
-          byte[] pageSizeBytes = new byte[2]; // The following 2 bytes are the page size
-          databaseFile.read(pageSizeBytes);
-          short pageSizeSigned = ByteBuffer.wrap(pageSizeBytes).getShort();
-          int pageSize = Short.toUnsignedInt(pageSizeSigned);
-
-          System.out.println("database page size: " + pageSize);
         } catch (IOException e) {
           System.out.println("Error reading file: " + e.getMessage());
         }
       }
       default -> System.out.println("Missing or invalid command passed: " + command);
     }
+  }
+
+  public static int getPageSize(FileInputStream databaseFile) throws IOException{
+    databaseFile.skip(16); // Pula os primeiros 16 bytes do cabecalho
+    byte[] pageSizeBytes = new byte[2]; // armazena o tamanho em bytes
+    databaseFile.read(pageSizeBytes);
+    short pageSizeSigned = ByteBuffer.wrap(pageSizeBytes).getShort();
+    int pageSize = Short.toUnsignedInt(pageSizeSigned);
+    return pageSize;
+  }
+
+  public static int countTable(FileInputStream databasefile) throws IOException{
+    int cont;
+    byte[] data = new byte[2];
+    databasefile.skip(100+3);
+    databasefile.read(data);
+    cont = ByteBuffer.wrap(data).getInt();
+    return cont;
   }
 }
