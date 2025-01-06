@@ -24,11 +24,7 @@ public class Main {
           short pageSizeSigned = ByteBuffer.wrap(pageSizeBytes).getShort();
           int pageSize = Short.toUnsignedInt(pageSizeSigned);
 
-          // You can use print statements as follows for debugging, they'll be visible when running tests.
-          System.err.println("Logs from your program will appear here!");
-
-          // Uncomment this block to pass the first stage
-          // System.out.println("database page size: " + pageSize);
+          System.out.println("database page size: " + pageSize);
         } catch (IOException e) {
           System.out.println("Error reading file: " + e.getMessage());
         }
